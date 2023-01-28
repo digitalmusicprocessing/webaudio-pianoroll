@@ -1111,6 +1111,10 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
             this.stepw = this.swidth/this.xrange;
             this.steph = this.sheight/this.yrange;
             this.redrawGrid();
+            let textArea = document.getElementById("cs372output");
+            if (!(textArea === null)) {
+                textArea.innerHTML = this.getCS372Text();
+            }
             const l=this.sequence.length;
             for(let s=0; s<l; ++s){
                 const ev=this.sequence[s];
@@ -1159,4 +1163,37 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
         return v;
     }
     disconnectedCallback(){}
+    /**
+     * Convert the piano roll to the CS 372 format
+     */
+    getCS372Text() {
+        const A_OFFSET = 69;
+        // t is start time, g is duration
+        // n is note number + 69
+        let lastEnd = 0;
+        let s = "";
+        for (let i = 0; i < this.sequence.length; i++) {
+            let note = this.sequence[i];
+            let p = note.n - A_OFFSET;
+            let time = note.t;
+            if (time != lastEnd) {
+                console.log(time - lastEnd);
+                s += "nan " + JSON.stringify(time-lastEnd) + "\n";
+                lastEnd = time;
+            }
+            s += p + " " + note.g + "\n";
+            lastEnd += note.g;
+        }
+        console.log(s);
+        return s;
+    }
+
+    downloadCS372Text() {
+        let blob = new Blob([this.getCS372Text()], {type: "text/plain"});
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "tune.txt";
+        a.click();
+    }
 });

@@ -62,6 +62,7 @@ body{
     display:inline-block;
 }
 </style>
+<script src="dat.gui.min.js"></script>
 <!--<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>-->
 <script src="https://g200kg.github.io/webaudio-controls/webaudio-controls.js" ></script><script src="webaudio-pianoroll.js"></script>
 <script>
@@ -70,7 +71,7 @@ actx=new AudioContext();
 osc=actx.createOscillator();
 gain=actx.createGain();
 gain.gain.value=0;
-osc.type="sawtooth";
+osc.type="sine";
 osc.start();
 osc.connect(gain).connect(actx.destination);
 
@@ -102,11 +103,10 @@ function Layout(k){
 </script>
 </head>
 <body>
-<h1>webaudio-pianoroll Live Demo</h1>
+<h1>CS 372 Piano Roll Editor</h1>
+<h2>by Tatsuya Shinyagaito, edited by Chris Tralie</h2>
 <hr/>
-<h3><a href="https://github.com/g200kg/webaudio-pianoroll">GitHub Respository</a></h3>
-<h3><a href="./index3.html">timebase=480 dragpoly samples</a></h3>
-<h3><a href="./index2.html">Other samples</a></h3>
+<h3><a href="https://github.com/ursinus-cs372-s2023/webaudio-pianoroll">GitHub Respository</a></h3>
 <hr/>
 <br/>
 <div id="base">
@@ -117,13 +117,25 @@ function Layout(k){
 <webaudio-slider oninput="Layout(this)" id="yrange" direction="vert" width="24" height="120" min="3" max="32" value="16"></webaudio-slider>
 <webaudio-slider oninput="Layout(this)" id="yoffset" direction="vert" width="24" height="200" min="30" max="120" height="200" value="60"></webaudio-slider>
 </div>
-<button onclick="document.getElementById('mml').value=(document.getElementById('proll').getMMLString())">getMMLString</button>
-<button onclick="document.getElementById('proll').setMMLString(document.getElementById('mml').value)">setMMLString</button>
 <button onclick="Play()">Play</button>
 <button onclick="document.getElementById('proll').stop()">Stop</button>
+<button onclick="document.getElementById('proll').downloadCS372Text()">Download</button>
 <br/>
-<textarea id="mml" rows="10" cols="80"></textarea>
+<textarea id="cs372output" rows="40" cols="30"></textarea>
 <br/>
 <hr/>
+
+<script>
+    const proll = document.getElementById("proll");
+    let gui = new dat.GUI();
+    proll["▶️ Play"] = Play;
+    proll["⏹️ Stop"] = proll.stop
+    proll["⬇️ Download"] = proll.downloadCS372Text;
+    gui.add(proll, "tempo", 10, 240, 1);
+    gui.add(osc, "type", ["sine", "square", "sawtooth"]);
+    gui.add(proll, "▶️ Play");
+    gui.add(proll, "⏹️ Stop");
+    gui.add(proll, "⬇️ Download");
+</script>
 </body>
 </html>
